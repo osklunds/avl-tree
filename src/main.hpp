@@ -4,6 +4,8 @@
 
 #include <memory>
 #include <optional>
+#include <cassert>
+#include <iostream>
 
 template <typename Key, typename Value>
 class node {
@@ -18,14 +20,27 @@ public:
     int height;
 
     node(Key k, Value v);
-};
 
+    void check_invariants();
+};
 
 template <typename Key, typename Value>
 node<Key, Value>::node(Key k, Value v) {
     key = k;
     value= v;
     height = 0;
+}
+
+template <typename Key, typename Value>
+void node<Key, Value>::check_invariants() {
+    if (left) {
+        assert(left->parent.lock().get() == this);
+        left->check_invariants();
+    }
+    if (right) {
+        assert(right->parent.lock().get() == this);
+        right->check_invariants();
+    }
 }
 
 template <typename Key, typename Value>
@@ -36,6 +51,7 @@ private:
 public:
     std::optional<Value> find(Key key) const;
     void insert(Key key, Value value);
+    void check_invariants();
 };
 
 template <typename Key, typename Value>
@@ -58,6 +74,8 @@ std::optional<Value> avl_map<Key, Value>::find(Key key) const {
 
 template <typename Key, typename Value>
 void avl_map<Key, Value>::insert(Key key, Value value) {
+    check_invariants();
+
     if (!root) {
         root = std::make_shared<node<Key, Value>>(key, value);
         return;
@@ -87,6 +105,13 @@ void avl_map<Key, Value>::insert(Key key, Value value) {
             current->value = value;
             return;
         }
+    }
+}
+
+template <typename Key, typename Value>
+void avl_map<Key, Value>::check_invariants() {
+    if (root) {
+        root->check_invariants();
     }
 }
 
