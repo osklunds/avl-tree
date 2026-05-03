@@ -13,7 +13,19 @@ public:
 
     Key key;
     Value value;
+
+    int height;
+
+    node(Key k, Value v);
 };
+
+
+template <typename Key, typename Value>
+node<Key, Value>::node(Key k, Value v) {
+    key = k;
+    value= v;
+    height = 0;
+}
 
 template <typename Key, typename Value>
 class avl_map {
@@ -46,9 +58,7 @@ std::optional<Value> avl_map<Key, Value>::find(Key key) const {
 template <typename Key, typename Value>
 void avl_map<Key, Value>::insert(Key key, Value value) {
     if (!root) {
-        root = std::make_shared<node<Key, Value>>();
-        root->key = key;
-        root->value = value;
+        root = std::make_shared<node<Key, Value>>(key, value);
         return;
     }
     auto current = root;
@@ -60,18 +70,14 @@ void avl_map<Key, Value>::insert(Key key, Value value) {
             if (current->left) {
                 current = current->left;
             } else {
-                current->left = std::make_shared<node<Key, Value>>();
-                current->left->key = key;
-                current->left->value = value;
+                current->left = std::make_shared<node<Key, Value>>(key, value);
                 return;
             }
         } else if (res == std::weak_ordering::greater) {
             if (current->right) {
                 current = current->right;
             } else {
-                current->right = std::make_shared<node<Key, Value>>();
-                current->right->key = key;
-                current->right->value = value;
+                current->right = std::make_shared<node<Key, Value>>(key, value);
                 return;
             }
         } else {
