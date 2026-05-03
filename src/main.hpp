@@ -10,6 +10,7 @@ class node {
 public:
     std::shared_ptr<node> left;
     std::shared_ptr<node> right;
+    std::weak_ptr<node> parent;
 
     Key key;
     Value value;
@@ -71,6 +72,7 @@ void avl_map<Key, Value>::insert(Key key, Value value) {
                 current = current->left;
             } else {
                 current->left = std::make_shared<node<Key, Value>>(key, value);
+                current->left->parent = current;
                 return;
             }
         } else if (res == std::weak_ordering::greater) {
@@ -78,6 +80,7 @@ void avl_map<Key, Value>::insert(Key key, Value value) {
                 current = current->right;
             } else {
                 current->right = std::make_shared<node<Key, Value>>(key, value);
+                current->right->parent = current;
                 return;
             }
         } else {
