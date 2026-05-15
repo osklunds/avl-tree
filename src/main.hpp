@@ -155,7 +155,7 @@ avl_map<Key, Value>::insert_recursive(
         //        a          current
         //                temp      b
         
-        if (current->left_height() - current->right_height() > 1) {
+        if (current->balance() > 1) {
             auto temp = new_left->right;
             new_left->right = current;
             new_left->right->parent = new_left;
@@ -174,6 +174,33 @@ avl_map<Key, Value>::insert_recursive(
         current->right = new_right;
         new_right->parent = current;
         new_right->update_height();
+
+        //            current
+        //   a              new_right
+        //                temp      b 
+        //----------------------------------
+        //           new_right
+        //     current           b
+        //  a       temp
+
+        if (current->balance() < -1) {
+            auto temp = new_right->left;
+            new_right->left = current;
+            new_right->left->parent = new_right;
+
+            current->right = temp;
+            if (current->right) {
+                current->right->parent = current;
+            }
+
+            return new_right;
+        }
+
+
+
+
+
+
     } else {
         current->value = value;
     }
