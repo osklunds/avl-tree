@@ -165,6 +165,9 @@ avl_map<Key, Value>::insert_recursive(
                 current->left->parent = current;
             }
 
+            current->update_height();
+            new_left->update_height();
+
             return new_left;
         } else {
             return current;
@@ -192,6 +195,9 @@ avl_map<Key, Value>::insert_recursive(
             if (current->right) {
                 current->right->parent = current;
             }
+
+            current->update_height();
+            new_right->update_height();
 
             return new_right;
         }
