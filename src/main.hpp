@@ -87,10 +87,10 @@ void node<Key, Value>::check_invariants() {
     // to check_invariants(), but it seems to be fast enough.
     assert(height == calculate_height());
 
-    // assert(balance() == -1 ||
-    //        balance() == 0 ||
-    //        balance() == 1
-    //        );
+    assert(balance() == -1 ||
+           balance() == 0 ||
+           balance() == 1
+           );
 
     if (left && right) {
         // std::cout << "key: " << key << std::endl;
@@ -118,6 +118,9 @@ int node<Key, Value>::calculate_height() {
     return h+1;
 }
 
+
+
+
 template <typename Key, typename Value>
 class avl_map {
 private:
@@ -127,6 +130,9 @@ private:
                      Key key,
                      Value value
                      );
+
+    std::shared_ptr<node<Key, Value>>
+    right_rotate(std::shared_ptr<node<Key, Value>> current);
 
 public:
     std::optional<Value> find(Key key) const;
@@ -172,28 +178,8 @@ avl_map<Key, Value>::insert_recursive(
         current->update_height();
         new_left->update_height();
 
-        //            current
-        //   new_left          b
-        // a       temp
-        //----------------------------------
-        //           new_left
-        //        a          current
-        //                temp      b
-        
         if (current->balance() > 1) {
-            auto temp = new_left->right;
-            new_left->right = current;
-            new_left->right->parent = new_left;
-
-            current->left = temp;
-            if (current->left) {
-                current->left->parent = current;
-            }
-
-            current->update_height();
-            new_left->update_height();
-
-            return new_left;
+            return right_rotate(current);
         } else {
             return current;
         }
@@ -227,12 +213,6 @@ avl_map<Key, Value>::insert_recursive(
 
             return new_right;
         }
-
-
-
-
-
-
     } else {
         current->value = value;
     }
@@ -241,6 +221,32 @@ avl_map<Key, Value>::insert_recursive(
     // std::cout << "oskar: " << current->left_height() << std::endl;
     // std::cout << "oskar: " << current->right_height() << std::endl;
     return current;
+}
+
+//            current
+//   new_left          b
+// a       temp
+//----------------------------------
+//           new_left
+//        a          current
+//                temp      b
+template <typename Key, typename Value>
+std::shared_ptr<node<Key, Value>>
+avl_map<Key, Value>::right_rotate(std::shared_ptr<node<Key, Value>> current) {
+    auto new_left = current->left;
+    auto temp = new_left->right;
+    new_left->right = current;
+    new_left->right->parent = new_left;
+
+    current->left = temp;
+    if (current->left) {
+        current->left->parent = current;
+    }
+
+    current->update_height();
+    new_left->update_height();
+
+    return new_left;
 }
 
 template <typename Key, typename Value>
