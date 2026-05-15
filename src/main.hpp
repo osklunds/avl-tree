@@ -205,56 +205,56 @@ avl_map<Key, Value>::insert_recursive(
     return current;
 }
 
-//            current
-//   a              new_right
+//            old_top
+//   a              new_top
 //                temp      b 
 //----------------------------------
-//           new_right
-//     current           b
+//           new_top
+//     old_top           b
 //  a       temp
 template <typename Key, typename Value>
 std::shared_ptr<node<Key, Value>>
-avl_map<Key, Value>::left_rotate(std::shared_ptr<node<Key, Value>> current) {
-    auto new_right = current->right;
-    auto temp = new_right->left;
-    new_right->left = current;
-    new_right->left->parent = new_right;
+avl_map<Key, Value>::left_rotate(std::shared_ptr<node<Key, Value>> old_top) {
+    auto new_top = old_top->right;
+    auto temp = new_top->left;
+    new_top->left = old_top;
+    new_top->left->parent = new_top;
 
-    current->right = temp;
-    if (current->right) {
-        current->right->parent = current;
+    old_top->right = temp;
+    if (old_top->right) {
+        old_top->right->parent = old_top;
     }
 
-    current->update_height();
-    new_right->update_height();
+    old_top->update_height();
+    new_top->update_height();
 
-    return new_right;
+    return new_top;
 }
 
-//            current
-//   new_left          b
+//            old_top
+//   new_top          b
 // a       temp
 //----------------------------------
-//           new_left
-//        a          current
+//           new_top
+//        a          old_top
 //                temp      b
 template <typename Key, typename Value>
 std::shared_ptr<node<Key, Value>>
-avl_map<Key, Value>::right_rotate(std::shared_ptr<node<Key, Value>> current) {
-    auto new_left = current->left;
-    auto temp = new_left->right;
-    new_left->right = current;
-    new_left->right->parent = new_left;
+avl_map<Key, Value>::right_rotate(std::shared_ptr<node<Key, Value>> old_top) {
+    auto new_top = old_top->left;
+    auto temp = new_top->right;
+    new_top->right = old_top;
+    new_top->right->parent = new_top;
 
-    current->left = temp;
-    if (current->left) {
-        current->left->parent = current;
+    old_top->left = temp;
+    if (old_top->left) {
+        old_top->left->parent = old_top;
     }
 
-    current->update_height();
-    new_left->update_height();
+    old_top->update_height();
+    new_top->update_height();
 
-    return new_left;
+    return new_top;
 }
 
 template <typename Key, typename Value>
