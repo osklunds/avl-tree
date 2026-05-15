@@ -13,6 +13,7 @@ class node {
 public:
     std::shared_ptr<node> left;
     std::shared_ptr<node> right;
+    // todo: maybe parent pointer isn't needed?
     std::weak_ptr<node> parent;
 
     Key key;
