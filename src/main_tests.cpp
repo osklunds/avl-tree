@@ -79,3 +79,15 @@ TEST_CASE("insert_and_contains_random") {
         }
     }
 }
+
+TEST_CASE("insert_left_left") {
+    avl_map<int, int> map{};
+
+    map.insert(10, 1000);
+    map.insert(9, 900);
+    map.insert(8, 800);
+
+    REQUIRE(map.find(10) == 1000);
+    REQUIRE(map.find(9) == 900);
+    REQUIRE(map.find(8) == 800);
+}
