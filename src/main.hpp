@@ -182,7 +182,13 @@ avl_map<Key, Value>::insert_recursive(
         new_left->update_height();
 
         if (current->balance() > 1) {
-            return right_rotate(current);
+            if (key < current->left->key) {
+                return right_rotate(current);
+            } else {
+                std::cout << "oskar: " << "hej" << std::endl;
+                current->left = left_rotate(current->left);
+                return right_rotate(current);
+            }
         } else {
             return current;
         }
@@ -194,7 +200,13 @@ avl_map<Key, Value>::insert_recursive(
         new_right->update_height();
 
         if (current->balance() < -1) {
-            return left_rotate(current);
+            if (key > current->right->key) {
+                return left_rotate(current);
+            } else {
+                std::cout << "oskar: " << "hej2" << std::endl;
+                current->right = right_rotate(current->right);
+                return left_rotate(current);
+            }
         }
     } else {
         current->value = value;
