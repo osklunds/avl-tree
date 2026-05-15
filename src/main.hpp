@@ -28,13 +28,14 @@ public:
     void update_height();
 
     void check_invariants();
+    int calculate_height();
 };
 
 template <typename Key, typename Value>
 node<Key, Value>::node(Key k, Value v) {
     key = k;
     value= v;
-    height = 0;
+    height = 1;
 }
 
 template <typename Key, typename Value>
@@ -47,7 +48,7 @@ int node<Key, Value>::left_height() {
     if (left) {
         return left->height;
     } else {
-        return -1;
+        return 0;
     }
 }
 
@@ -56,7 +57,7 @@ int node<Key, Value>::right_height() {
     if (right) {
         return right->height;
     } else {
-        return -1;
+        return 0;
     }
 }
 
@@ -67,6 +68,11 @@ void node<Key, Value>::update_height() {
 
 template <typename Key, typename Value>
 void node<Key, Value>::check_invariants() {
+    // std::cout << "key: " << key << std::endl;
+    // std::cout << "oskar: " << height << std::endl;
+    // std::cout << "oskar: " << calculate_height() << std::endl;
+
+
     if (left) {
         assert(left->parent.lock().get() == this);
         left->check_invariants();
@@ -76,10 +82,15 @@ void node<Key, Value>::check_invariants() {
         right->check_invariants();
     }
 
-    assert(balance() == -1 ||
-           balance() == 0 ||
-           balance() == 1
-           );
+    // Check that heights are stored correctly
+    // Wasteful to calculate for each node for each recursive call
+    // to check_invariants(), but it seems to be fast enough.
+    assert(height == calculate_height());
+
+    // assert(balance() == -1 ||
+    //        balance() == 0 ||
+    //        balance() == 1
+    //        );
 
     if (left && right) {
         // std::cout << "key: " << key << std::endl;
@@ -92,6 +103,19 @@ void node<Key, Value>::check_invariants() {
         // assert((height == left->height + 1) || (height == left->height + 2));
         // assert((height == right->height + 1) || (height == right->height + 2));
     }
+}
+
+template <typename Key, typename Value>
+int node<Key, Value>::calculate_height() {
+    int h = 0;
+    if (left) {
+        h = left->calculate_height();
+    }
+    if (right) {
+        h = std::max(h, right->calculate_height());
+    }
+
+    return h+1;
 }
 
 template <typename Key, typename Value>
@@ -144,7 +168,8 @@ avl_map<Key, Value>::insert_recursive(
     if (res == std::weak_ordering::less) {
         auto new_left = insert_recursive(current->left, key, value);
         current->left = new_left;
-        new_left->parent = current;
+        current->left->parent = current;
+        current->update_height();
         new_left->update_height();
 
         //            current
@@ -175,7 +200,8 @@ avl_map<Key, Value>::insert_recursive(
     } else if (res == std::weak_ordering::greater) {
         auto new_right = insert_recursive(current->right, key, value);
         current->right = new_right;
-        new_right->parent = current;
+        current->right->parent = current;
+        current->update_height();
         new_right->update_height();
 
         //            current
