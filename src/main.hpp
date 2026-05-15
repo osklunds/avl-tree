@@ -22,6 +22,7 @@ public:
 
     node(Key k, Value v);
 
+    int balance();
     int left_height();
     int right_height();
     void update_height();
@@ -34,6 +35,11 @@ node<Key, Value>::node(Key k, Value v) {
     key = k;
     value= v;
     height = 0;
+}
+
+template <typename Key, typename Value>
+int node<Key, Value>::balance() {
+    return left_height() - right_height();
 }
 
 template <typename Key, typename Value>
@@ -69,6 +75,11 @@ void node<Key, Value>::check_invariants() {
         assert(right->parent.lock().get() == this);
         right->check_invariants();
     }
+
+    assert(balance() == -1 ||
+           balance() == 0 ||
+           balance() == 1
+           );
 
     if (left && right) {
         // std::cout << "key: " << key << std::endl;
@@ -135,7 +146,6 @@ avl_map<Key, Value>::insert_recursive(
         current->left = new_left;
         new_left->parent = current;
         new_left->update_height();
-
 
         //            current
         //   new_left          b
