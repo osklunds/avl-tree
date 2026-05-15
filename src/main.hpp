@@ -24,7 +24,7 @@ public:
 
     int left_height();
     int right_height();
-    void update_heights();
+    void update_height();
 
     void check_invariants();
 };
@@ -55,21 +55,8 @@ int node<Key, Value>::right_height() {
 }
 
 template <typename Key, typename Value>
-void node<Key, Value>::update_heights() {
-    std::weak_ptr<node<Key, Value>> current = parent;
-    while (!current.expired()) {
-        std::shared_ptr<node<Key,Value>> current_locked = current.lock();
-        current_locked->height = 0;
-        if (current_locked->left) {
-            current_locked->height = current_locked->left->height + 1;
-        }
-        if (current_locked->right) {
-            current_locked->height =
-                std::max(current_locked->height, current_locked->right->height + 1);
-        }
-
-        current = current_locked->parent;
-    }
+void node<Key, Value>::update_height() {
+    height = 1 + std::max(left_height(), right_height());
 }
 
 template <typename Key, typename Value>
@@ -147,14 +134,43 @@ avl_map<Key, Value>::insert_recursive(
         auto new_left = insert_recursive(current->left, key, value);
         current->left = new_left;
         new_left->parent = current;
+        new_left->update_height();
+
+
+        //            current
+        //   new_left          b
+        // a       temp
+        //----------------------------------
+        //           new_left
+        //        a          current
+        //                temp      b
+        
+        if (current->left_height() - current->right_height() > 1) {
+            auto temp = new_left->right;
+            new_left->right = current;
+            new_left->right->parent = new_left;
+
+            current->left = temp;
+            if (current->left) {
+                current->left->parent = current;
+            }
+
+            return new_left;
+        } else {
+            return current;
+        }
     } else if (res == std::weak_ordering::greater) {
         auto new_right = insert_recursive(current->right, key, value);
         current->right = new_right;
         new_right->parent = current;
+        new_right->update_height();
     } else {
         current->value = value;
     }
-
+    current->update_height();
+    // std::cout << "key: " << current->key << std::endl;
+    // std::cout << "oskar: " << current->left_height() << std::endl;
+    // std::cout << "oskar: " << current->right_height() << std::endl;
     return current;
 }
 
