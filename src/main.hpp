@@ -146,9 +146,11 @@ avl_map<Key, Value>::insert_recursive(
     if (res == std::weak_ordering::less) {
         auto new_left = insert_recursive(current->left, key, value);
         current->left = new_left;
+        new_left->parent = current;
     } else if (res == std::weak_ordering::greater) {
         auto new_right = insert_recursive(current->right, key, value);
         current->right = new_right;
+        new_right->parent = current;
     } else {
         current->value = value;
     }
@@ -159,6 +161,7 @@ avl_map<Key, Value>::insert_recursive(
 template <typename Key, typename Value>
 void avl_map<Key, Value>::insert(Key key, Value value) {
     root = insert_recursive(root, key, value);
+    check_invariants();
 }
 
 template <typename Key, typename Value>
