@@ -83,7 +83,7 @@ TEST_CASE("insert_and_contains_fixed") {
     REQUIRE(map.find(7) == 701);
 }
 
-TEST_CASE("insert_and_contains_random") {
+TEST_CASE("insert_random") {
     avl_map<int, int> avl_map{};
     std::map<int, int> map{};
 
@@ -92,7 +92,7 @@ TEST_CASE("insert_and_contains_random") {
     const int max = 1000;
     std::uniform_int_distribution<std::mt19937::result_type> dist(1,max);
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 10000; i++) {
         int key = dist(rng);
         int value = dist(rng);
 
@@ -250,6 +250,31 @@ TEST_CASE("remove_two_children") {
     REQUIRE(map.find(10) == 1000);
     REQUIRE(map.find(11) == std::nullopt);
     REQUIRE(map.find(12) == 1200);
+}
+
+TEST_CASE("remove_rotate") {
+    avl_map<int, int> map{};
+
+    map.insert(11, 1100);
+    map.insert(10, 1000);
+    map.insert(12, 1200);
+    map.insert(9, 900);
+
+    //      11
+    //    10  12
+    //  9
+
+    REQUIRE(map.find(9) == 900);
+    REQUIRE(map.find(10) == 1000);
+    REQUIRE(map.find(11) == 1100);
+    REQUIRE(map.find(12) == 1200);
+
+    map.remove(12);
+
+    REQUIRE(map.find(9) == 900);
+    REQUIRE(map.find(10) == 1000);
+    REQUIRE(map.find(11) == 1100);
+    REQUIRE(map.find(12) == std::nullopt);
 }
 
 TEST_CASE("remove_random") {

@@ -22,7 +22,7 @@ public:
     node(Key k, Value v);
 
     static int height_maybe(std::shared_ptr<const node> node);
-    int balance() const;
+    static int balance(std::shared_ptr<const node> node);
     void update_height();
 
     // Only for invariant checking
@@ -47,8 +47,12 @@ int node<Key, Value>::height_maybe(std::shared_ptr<const node> node) {
 }
 
 template <typename Key, typename Value>
-int node<Key, Value>::balance() const {
-    return height_maybe(left) - height_maybe(right);
+int node<Key, Value>::balance(std::shared_ptr<const node> node) {
+    if (node) {
+        return height_maybe(node->left) - height_maybe(node->right);
+    } else {
+        return 0;
+    }
 }
 
 template <typename Key, typename Value>
@@ -74,9 +78,9 @@ void node<Key, Value>::check_invariants() const {
     // to check_invariants(), but it seems to be fast enough.
     assert(height == calculate_height());
 
-    // assert(balance() == -1 ||
-    //        balance() == 0 ||
-    //        balance() == 1
+    // assert(balance(this) == -1 ||
+    //        balance(this) == 0 ||
+    //        balance(this) == 1
     //        );
 }
 
@@ -166,7 +170,7 @@ avl_map<Key, Value>::insert_recursive(
         current->update_height();
         new_left->update_height();
 
-        if (current->balance() > 1) {
+        if (node<Key, Value>::balance(current) > 1) {
             if (key < current->left->key) {
                 return right_rotate(current);
             } else {
@@ -183,7 +187,7 @@ avl_map<Key, Value>::insert_recursive(
         current->update_height();
         new_right->update_height();
 
-        if (current->balance() < -1) {
+        if (node<Key, Value>::balance(current) < -1) {
             if (key > current->right->key) {
                 return left_rotate(current);
             } else {
@@ -209,6 +213,7 @@ template <typename Key, typename Value>
 std::shared_ptr<node<Key, Value>>
 avl_map<Key, Value>::left_rotate(std::shared_ptr<node<Key, Value>> old_top) {
     auto new_top = old_top->right;
+    assert(new_top);
     auto temp = new_top->left;
     new_top->left = old_top;
     new_top->left->parent = new_top;
@@ -235,6 +240,7 @@ template <typename Key, typename Value>
 std::shared_ptr<node<Key, Value>>
 avl_map<Key, Value>::right_rotate(std::shared_ptr<node<Key, Value>> old_top) {
     auto new_top = old_top->left;
+    assert(new_top);
     auto temp = new_top->right;
     new_top->right = old_top;
     new_top->right->parent = new_top;
@@ -274,13 +280,17 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
     auto res = key <=> current->key;
 
     if (res == std::weak_ordering::less) {
-        current->left = remove_recursive(current->left, key);
-        current->update_height();
-        return current;
+        auto new_left = remove_recursive(current->left, key);
+        current->left = new_left;
+        if (current->left) {
+            current->left->parent = current;
+        }
     } else if (res == std::weak_ordering::greater) {
-        current->right = remove_recursive(current->right, key);
-        current->update_height();
-        return current;
+        auto new_right = remove_recursive(current->right, key);
+        current->right = new_right;
+        if (current->right) {
+            current->right->parent = current;
+        }
     } else {
         if (current->left && current->right) {
             // change current value to the smallest value in the right subtree,
@@ -297,10 +307,11 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
             auto new_key = smallest_right->key;
             auto new_value = smallest_right->value;
             current->right = remove_recursive(current->right, new_key);
-            current->update_height();
+            if (current->right) {
+                current->right->parent = current;
+            }
             current->key = new_key;
             current->value = new_value;
-            return current;
         } else if (current->left && !current->right) {
             current->left->parent = current->parent;
             return current->left;
@@ -311,6 +322,30 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
             return nullptr;
         }
     }
+
+    current->update_height();
+
+    if (node<Key, Value>::balance(current) > 1) {
+        if (node<Key, Value>::balance(current->left) >= 0) {
+            return right_rotate(current);
+        } else {
+            current->left = left_rotate(current->left);
+            return right_rotate(current);
+        }
+    }
+
+    if (node<Key, Value>::balance(current) < -1) {
+        if (node<Key, Value>::balance(current->right) <= 0) {
+            return left_rotate(current);
+        } else {
+            current->right = right_rotate(current->right);
+            return left_rotate(current);
+        }
+    }
+
+
+
+    return current;
 }
 
 template <typename Key, typename Value>
