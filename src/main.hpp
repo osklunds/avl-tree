@@ -21,13 +21,13 @@ public:
 
     node(Key k, Value v);
 
-    static int height_maybe(std::shared_ptr<node> node);
-    int balance();
+    static int height_maybe(std::shared_ptr<const node> node);
+    int balance() const;
     void update_height();
 
     // Only for invariant checking
-    void check_invariants();
-    int calculate_height();
+    void check_invariants() const;
+    int calculate_height() const;
 };
 
 template <typename Key, typename Value>
@@ -38,7 +38,7 @@ node<Key, Value>::node(Key k, Value v) {
 }
 
 template <typename Key, typename Value>
-int node<Key, Value>::height_maybe(std::shared_ptr<node> node) {
+int node<Key, Value>::height_maybe(std::shared_ptr<const node> node) {
     if (node) {
         return node->height;
     } else {
@@ -47,7 +47,7 @@ int node<Key, Value>::height_maybe(std::shared_ptr<node> node) {
 }
 
 template <typename Key, typename Value>
-int node<Key, Value>::balance() {
+int node<Key, Value>::balance() const {
     return height_maybe(left) - height_maybe(right);
 }
 
@@ -57,7 +57,7 @@ void node<Key, Value>::update_height() {
 }
 
 template <typename Key, typename Value>
-void node<Key, Value>::check_invariants() {
+void node<Key, Value>::check_invariants() const {
     if (left) {
         assert(left->parent.lock().get() == this);
         left->check_invariants();
@@ -79,7 +79,7 @@ void node<Key, Value>::check_invariants() {
 }
 
 template <typename Key, typename Value>
-int node<Key, Value>::calculate_height() {
+int node<Key, Value>::calculate_height() const {
     int h = 0;
     if (left) {
         h = left->calculate_height();
@@ -112,7 +112,7 @@ private:
 public:
     std::optional<Value> find(Key key) const;
     void insert(Key key, Value value);
-    void check_invariants();
+    void check_invariants() const;
 };
 
 template <typename Key, typename Value>
@@ -244,7 +244,7 @@ void avl_map<Key, Value>::insert(Key key, Value value) {
 }
 
 template <typename Key, typename Value>
-void avl_map<Key, Value>::check_invariants() {
+void avl_map<Key, Value>::check_invariants() const {
     if (root) {
         root->check_invariants();
     }
