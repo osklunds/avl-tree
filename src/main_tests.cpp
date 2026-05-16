@@ -14,17 +14,26 @@ TEST_CASE("insert_and_contains_fixed") {
     map.insert(10, 1000);
 
     REQUIRE(map.find(10) == 1000);
+    REQUIRE(map.find(20) == std::nullopt);
+    REQUIRE(map.find(30) == std::nullopt);
+    REQUIRE(map.find(5) == std::nullopt);
+    REQUIRE(map.find(7) == std::nullopt);
 
     map.insert(20, 2000);
 
     REQUIRE(map.find(10) == 1000);
     REQUIRE(map.find(20) == 2000);
+    REQUIRE(map.find(30) == std::nullopt);
+    REQUIRE(map.find(5) == std::nullopt);
+    REQUIRE(map.find(7) == std::nullopt);
 
     map.insert(30, 3000);
 
     REQUIRE(map.find(10) == 1000);
     REQUIRE(map.find(20) == 2000);
     REQUIRE(map.find(30) == 3000);
+    REQUIRE(map.find(5) == std::nullopt);
+    REQUIRE(map.find(7) == std::nullopt);
 
     map.insert(5, 500);
 
@@ -32,6 +41,7 @@ TEST_CASE("insert_and_contains_fixed") {
     REQUIRE(map.find(20) == 2000);
     REQUIRE(map.find(30) == 3000);
     REQUIRE(map.find(5) == 500);
+    REQUIRE(map.find(7) == std::nullopt);
 
     map.insert(7, 700);
 
