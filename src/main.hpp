@@ -268,6 +268,7 @@ template <typename Key, typename Value>
 bool avl_map<Key, Value>::remove(Key key) {
     root = remove_recursive(root, key);
     node<Key, Value>::check_invariants(root);
+    // todo
     return false;
 }
 
