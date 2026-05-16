@@ -275,9 +275,11 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
 
     if (res == std::weak_ordering::less) {
         current->left = remove_recursive(current->left, key);
+        current->update_height();
         return current;
     } else if (res == std::weak_ordering::greater) {
         current->right = remove_recursive(current->right, key);
+        current->update_height();
         return current;
     } else {
         if (current->left && current->right) {
@@ -296,6 +298,7 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
             auto new_key = smallest_right->key;
             auto new_value = smallest_right->value;
             current->right = remove_recursive(current->right, new_key);
+            current->update_height();
             current->key = new_key;
             current->value = new_value;
             return current;
