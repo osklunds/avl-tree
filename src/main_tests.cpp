@@ -138,11 +138,11 @@ TEST_CASE("insert_right_left") {
     REQUIRE(map.find(12) == 1200);
 }
 
-TEST_CASE("remove") {
+TEST_CASE("remove_no_children") {
     avl_map<int, int> map{};
 
-    map.insert(10, 1000);
     map.insert(11, 1100);
+    map.insert(10, 1000);
     map.insert(12, 1200);
 
     REQUIRE(map.find(10) == 1000);
@@ -155,6 +155,77 @@ TEST_CASE("remove") {
 
     REQUIRE(map.find(10) == std::nullopt);
     REQUIRE(map.find(11) == 1100);
+    REQUIRE(map.find(12) == 1200);
+}
+
+TEST_CASE("remove_left_child") {
+    avl_map<int, int> map{};
+
+    map.insert(11, 1100);
+    map.insert(10, 1000);
+    map.insert(12, 1200);
+    map.insert(9, 900);
+
+    //     11
+    //   10  12
+    // 9 
+
+    REQUIRE(map.find(9) == 900);
+    REQUIRE(map.find(10) == 1000);
+    REQUIRE(map.find(11) == 1100);
+    REQUIRE(map.find(12) == 1200);
+
+    map.remove(10);
+
+    REQUIRE(map.find(9) == 900);
+    REQUIRE(map.find(10) == std::nullopt);
+    REQUIRE(map.find(11) == 1100);
+    REQUIRE(map.find(12) == 1200);
+}
+
+TEST_CASE("remove_right_child") {
+    avl_map<int, int> map{};
+
+    map.insert(11, 1100);
+    map.insert(10, 1000);
+    map.insert(12, 1200);
+    map.insert(13, 1300);
+
+    //     11
+    //   10  12
+    //         13 
+
+    REQUIRE(map.find(10) == 1000);
+    REQUIRE(map.find(11) == 1100);
+    REQUIRE(map.find(12) == 1200);
+    REQUIRE(map.find(13) == 1300);
+
+    map.remove(12);
+
+    REQUIRE(map.find(10) == 1000);
+    REQUIRE(map.find(11) == 1100);
+    REQUIRE(map.find(12) == std::nullopt);
+    REQUIRE(map.find(13) == 1300);
+}
+
+TEST_CASE("remove_two_children") {
+    avl_map<int, int> map{};
+
+    map.insert(11, 1100);
+    map.insert(10, 1000);
+    map.insert(12, 1200);
+
+    //     11
+    //   10  12
+
+    REQUIRE(map.find(10) == 1000);
+    REQUIRE(map.find(11) == 1100);
+    REQUIRE(map.find(12) == 1200);
+
+    map.remove(11);
+
+    REQUIRE(map.find(10) == 1000);
+    REQUIRE(map.find(11) == std::nullopt);
     REQUIRE(map.find(12) == 1200);
 }
 
