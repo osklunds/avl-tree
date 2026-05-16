@@ -283,13 +283,12 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
         return current;
     } else {
         if (current->left && current->right) {
-            std::cout << "oskar: " << "two" << std::endl;
             // change current value to the smallest value in the right subtree,
             // then delete that value from the right subtree.
             auto smallest_right = current->right;
             while (true) {
-                if (smallest_right->right) {
-                    smallest_right = smallest_right->right;
+                if (smallest_right->left) {
+                    smallest_right = smallest_right->left;
                 } else {
                     break;
                 }
@@ -303,15 +302,12 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
             current->value = new_value;
             return current;
         } else if (current->left && !current->right) {
-            std::cout << "oskar: " << "left" << std::endl;
             current->left->parent = current->parent;
             return current->left;
         } else if (!current->left && current->right) {
-            std::cout << "oskar: " << "right" << std::endl;
             current->right->parent = current->parent;
             return current->right;
         } else {
-            std::cout << "oskar: " << "none" << std::endl;
             return nullptr;
         }
     }
