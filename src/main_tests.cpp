@@ -6,6 +6,29 @@
 #include <map>
 #include <random>
 
+#include <stdio.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+// Copied from https://stackoverflow.com/a/77336
+// Used for showing a stacktrace when segfault
+// Call as in a test case ---> signal(SIGSEGV, handler);
+void handler(int sig) {
+  void *array[10];
+  size_t size;
+
+  // get void*'s for all entries on the stack
+  size = backtrace(array, 10);
+
+  // print out all the frames to stderr
+  fprintf(stderr, "Error: signal %d:\n", sig);
+  backtrace_symbols_fd(array, size, STDERR_FILENO);
+  exit(1);
+}
+
+
 TEST_CASE("insert_and_contains_fixed") {
     avl_map<int, int> map{};
 
@@ -230,6 +253,8 @@ TEST_CASE("remove_two_children") {
 }
 
 TEST_CASE("remove_random") {
+    signal(SIGSEGV, handler);
+
     avl_map<int, int> avl_map{};
     std::map<int, int> map{};
 
@@ -238,7 +263,7 @@ TEST_CASE("remove_random") {
     const int max = 1000;
     std::uniform_int_distribution<std::mt19937::result_type> dist(1,max);
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 10000; i++) {
         int key = dist(rng);
         int value = dist(rng);
         bool insert = dist(rng) % 2;

@@ -7,6 +7,9 @@ project(AvlTree)
 include(ExternalProject)
 set(CMAKE_BUILD_PARALLEL_LEVEL 8)
 
+# Needed for stack trace
+set (CMAKE_CXX_FLAGS "-g -rdynamic")
+
 # Main executable
 add_executable(main
 src/main.cpp
