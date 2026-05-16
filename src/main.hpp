@@ -11,25 +11,23 @@
 template <typename Key, typename Value>
 class node {
 public:
-    std::shared_ptr<node> left;
-    std::shared_ptr<node> right;
-    // todo: maybe parent pointer isn't needed?
-    std::weak_ptr<node> parent;
-
     Key key;
     Value value;
 
+    std::shared_ptr<node> left;
+    std::shared_ptr<node> right;
+    std::weak_ptr<node> parent;
     int height;
 
     node(Key k, Value v);
 
+    static int height_maybe(std::shared_ptr<node> node);
     int balance();
     void update_height();
 
+    // Only for invariant checking
     void check_invariants();
     int calculate_height();
-
-    static int height_maybe(std::shared_ptr<node> node);
 };
 
 template <typename Key, typename Value>
