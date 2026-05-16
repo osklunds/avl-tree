@@ -69,11 +69,6 @@ void node<Key, Value>::update_height() {
 
 template <typename Key, typename Value>
 void node<Key, Value>::check_invariants() {
-    // std::cout << "key: " << key << std::endl;
-    // std::cout << "oskar: " << height << std::endl;
-    // std::cout << "oskar: " << calculate_height() << std::endl;
-
-
     if (left) {
         assert(left->parent.lock().get() == this);
         left->check_invariants();
@@ -88,22 +83,10 @@ void node<Key, Value>::check_invariants() {
     // to check_invariants(), but it seems to be fast enough.
     assert(height == calculate_height());
 
-    // assert(balance() == -1 ||
-    //        balance() == 0 ||
-    //        balance() == 1
-    //        );
-
-    if (left && right) {
-        // std::cout << "key: " << key << std::endl;
-        // std::cout << "left: " << left->key << std::endl;
-        // std::cout << "right: " << right->key << std::endl;
-        // std::cout << "height: " << height << std::endl;
-        // std::cout << "left height: " << left->height << std::endl;
-        // std::cout << "right height: " << right->height << std::endl;
-        // Doesn't pass yet due to no balancing
-        // assert((height == left->height + 1) || (height == left->height + 2));
-        // assert((height == right->height + 1) || (height == right->height + 2));
-    }
+    assert(balance() == -1 ||
+           balance() == 0 ||
+           balance() == 1
+           );
 }
 
 template <typename Key, typename Value>
@@ -185,7 +168,6 @@ avl_map<Key, Value>::insert_recursive(
             if (key < current->left->key) {
                 return right_rotate(current);
             } else {
-                std::cout << "oskar: " << "hej" << std::endl;
                 current->left = left_rotate(current->left);
                 return right_rotate(current);
             }
@@ -203,7 +185,6 @@ avl_map<Key, Value>::insert_recursive(
             if (key > current->right->key) {
                 return left_rotate(current);
             } else {
-                std::cout << "oskar: " << "hej2" << std::endl;
                 current->right = right_rotate(current->right);
                 return left_rotate(current);
             }
@@ -212,9 +193,6 @@ avl_map<Key, Value>::insert_recursive(
         current->value = value;
     }
     current->update_height();
-    // std::cout << "key: " << current->key << std::endl;
-    // std::cout << "oskar: " << current->left_height() << std::endl;
-    // std::cout << "oskar: " << current->right_height() << std::endl;
     return current;
 }
 
