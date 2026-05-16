@@ -301,9 +301,11 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
             return current;
         } else if (current->left && !current->right) {
             std::cout << "oskar: " << "left" << std::endl;
+            current->left->parent = current->parent;
             return current->left;
         } else if (!current->left && current->right) {
             std::cout << "oskar: " << "right" << std::endl;
+            current->right->parent = current->parent;
             return current->right;
         } else {
             std::cout << "oskar: " << "none" << std::endl;
