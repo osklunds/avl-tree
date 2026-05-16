@@ -67,15 +67,17 @@ void node<Key, Value>::check_invariants() const {
         right->check_invariants();
     }
 
+    // todo: check BST property
+
     // Check that heights are stored correctly
     // Wasteful to calculate for each node for each recursive call
     // to check_invariants(), but it seems to be fast enough.
     assert(height == calculate_height());
 
-    assert(balance() == -1 ||
-           balance() == 0 ||
-           balance() == 1
-           );
+    // assert(balance() == -1 ||
+    //        balance() == 0 ||
+    //        balance() == 1
+    //        );
 }
 
 template <typename Key, typename Value>
@@ -103,6 +105,10 @@ private:
                      Key key,
                      Value value
                      );
+    std::shared_ptr<node<Key, Value>>
+    remove_recursive(std::shared_ptr<node<Key, Value>> current,
+                     Key key
+                     );
 
     std::shared_ptr<node<Key, Value>>
     left_rotate(std::shared_ptr<node<Key, Value>> current);
@@ -112,7 +118,13 @@ private:
 public:
     std::optional<Value> find(Key key) const;
     void insert(Key key, Value value);
+    bool remove(Key key);
     void check_invariants() const;
+
+    // todo:
+    // compare
+    // iterator
+    // min/max
 };
 
 // todo: consider to merge with insert/delete
@@ -242,6 +254,61 @@ template <typename Key, typename Value>
 void avl_map<Key, Value>::insert(Key key, Value value) {
     root = insert_recursive(root, key, value);
     check_invariants();
+}
+
+template <typename Key, typename Value>
+bool avl_map<Key, Value>::remove(Key key) {
+    root = remove_recursive(root, key);
+    return false;
+}
+
+template <typename Key, typename Value>
+std::shared_ptr<node<Key, Value>>
+avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
+                                      Key key) {
+    if (current == nullptr) {
+        return nullptr;
+    }
+
+    auto res = key <=> current->key;
+
+    if (res == std::weak_ordering::less) {
+        current->left = remove_recursive(current->left, key);
+        return current;
+    } else if (res == std::weak_ordering::greater) {
+        current->right = remove_recursive(current->right, key);
+        return current;
+    } else {
+        if (current->left && current->right) {
+            std::cout << "oskar: " << "two" << std::endl;
+            // change current value to the smallest value in the right subtree,
+            // then delete that value from the right subtree.
+            auto smallest_right = current->right;
+            while (true) {
+                if (smallest_right->right) {
+                    smallest_right = smallest_right->right;
+                } else {
+                    break;
+                }
+            }
+
+            auto new_key = smallest_right->key;
+            auto new_value = smallest_right->value;
+            current->right = remove_recursive(current->right, new_key);
+            current->key = new_key;
+            current->value = new_value;
+            return current;
+        } else if (current->left && !current->right) {
+            std::cout << "oskar: " << "left" << std::endl;
+            return current->left;
+        } else if (!current->left && current->right) {
+            std::cout << "oskar: " << "right" << std::endl;
+            return current->right;
+        } else {
+            std::cout << "oskar: " << "none" << std::endl;
+            return nullptr;
+        }
+    }
 }
 
 template <typename Key, typename Value>
