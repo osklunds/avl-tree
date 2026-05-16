@@ -60,14 +60,14 @@ template <typename Key, typename Value>
 void node<Key, Value>::check_invariants() const {
     if (left) {
         assert(left->parent.lock().get() == this);
+        assert(left->key < key);
         left->check_invariants();
     }
     if (right) {
         assert(right->parent.lock().get() == this);
+        assert(right->key > key);
         right->check_invariants();
     }
-
-    // todo: check BST property
 
     // Check that heights are stored correctly
     // Wasteful to calculate for each node for each recursive call
