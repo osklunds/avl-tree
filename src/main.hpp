@@ -26,7 +26,7 @@ public:
     void update_height();
 
     // Only for invariant checking
-    void check_invariants() const;
+    static void check_invariants(std::shared_ptr<const node> node);
     int calculate_height() const;
 };
 
@@ -61,27 +61,29 @@ void node<Key, Value>::update_height() {
 }
 
 template <typename Key, typename Value>
-void node<Key, Value>::check_invariants() const {
-    if (left) {
-        assert(left->parent.lock().get() == this);
-        assert(left->key < key);
-        left->check_invariants();
-    }
-    if (right) {
-        assert(right->parent.lock().get() == this);
-        assert(right->key > key);
-        right->check_invariants();
-    }
+void node<Key, Value>::check_invariants(std::shared_ptr<const node> node) {
+    if (node) {
+        if (node->left) {
+            assert(node->left->parent.lock() == node);
+            assert(node->left->key < node->key);
+            check_invariants(node->left);
+        }
+        if (node->right) {
+            assert(node->right->parent.lock() == node);
+            assert(node->right->key > node->key);
+            check_invariants(node->right);
+        }
 
-    // Check that heights are stored correctly
-    // Wasteful to calculate for each node for each recursive call
-    // to check_invariants(), but it seems to be fast enough.
-    assert(height == calculate_height());
+        // Check that heights are stored correctly
+        // Wasteful to calculate for each node for each recursive call
+        // to check_invariants(), but it seems to be fast enough.
+        assert(node->height == node->calculate_height());
 
-    // assert(balance(this) == -1 ||
-    //        balance(this) == 0 ||
-    //        balance(this) == 1
-    //        );
+        assert(balance(node) == -1 ||
+               balance(node) == 0 ||
+               balance(node) == 1
+               );
+    }
 }
 
 template <typename Key, typename Value>
@@ -259,13 +261,13 @@ avl_map<Key, Value>::right_rotate(std::shared_ptr<node<Key, Value>> old_top) {
 template <typename Key, typename Value>
 void avl_map<Key, Value>::insert(Key key, Value value) {
     root = insert_recursive(root, key, value);
-    check_invariants();
+    node<Key, Value>::check_invariants(root);
 }
 
 template <typename Key, typename Value>
 bool avl_map<Key, Value>::remove(Key key) {
     root = remove_recursive(root, key);
-    check_invariants();
+    node<Key, Value>::check_invariants(root);
     return false;
 }
 
@@ -351,7 +353,7 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
 template <typename Key, typename Value>
 void avl_map<Key, Value>::check_invariants() const {
     if (root) {
-        root->check_invariants();
+        node<Key, Value>::check_invariants(root);
     }
 }
 
