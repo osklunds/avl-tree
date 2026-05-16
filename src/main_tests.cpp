@@ -115,3 +115,15 @@ TEST_CASE("insert_right_right") {
     REQUIRE(map.find(11) == 1100);
     REQUIRE(map.find(12) == 1200);
 }
+
+TEST_CASE("insert_right_left") {
+    avl_map<int, int> map{};
+
+    map.insert(10, 1000);
+    map.insert(12, 1200);
+    map.insert(11, 1100);
+
+    REQUIRE(map.find(10) == 1000);
+    REQUIRE(map.find(11) == 1100);
+    REQUIRE(map.find(12) == 1200);
+}
