@@ -115,6 +115,7 @@ public:
     void check_invariants() const;
 };
 
+// todo: consider to merge with insert/delete
 template <typename Key, typename Value>
 std::optional<Value> avl_map<Key, Value>::find(Key key) const {
     auto current = root;
