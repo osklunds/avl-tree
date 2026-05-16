@@ -24,12 +24,12 @@ public:
     node(Key k, Value v);
 
     int balance();
-    int left_height();
-    int right_height();
     void update_height();
 
     void check_invariants();
     int calculate_height();
+
+    static int height_maybe(std::shared_ptr<node> node);
 };
 
 template <typename Key, typename Value>
@@ -40,31 +40,22 @@ node<Key, Value>::node(Key k, Value v) {
 }
 
 template <typename Key, typename Value>
+int node<Key, Value>::height_maybe(std::shared_ptr<node> node) {
+    if (node) {
+        return node->height;
+    } else {
+        return 0;
+    }
+}
+
+template <typename Key, typename Value>
 int node<Key, Value>::balance() {
-    return left_height() - right_height();
-}
-
-template <typename Key, typename Value>
-int node<Key, Value>::left_height() {
-    if (left) {
-        return left->height;
-    } else {
-        return 0;
-    }
-}
-
-template <typename Key, typename Value>
-int node<Key, Value>::right_height() {
-    if (right) {
-        return right->height;
-    } else {
-        return 0;
-    }
+    return height_maybe(left) - height_maybe(right);
 }
 
 template <typename Key, typename Value>
 void node<Key, Value>::update_height() {
-    height = 1 + std::max(left_height(), right_height());
+    height = 1 + std::max(height_maybe(left), height_maybe(right));
 }
 
 template <typename Key, typename Value>
