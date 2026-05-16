@@ -259,6 +259,7 @@ void avl_map<Key, Value>::insert(Key key, Value value) {
 template <typename Key, typename Value>
 bool avl_map<Key, Value>::remove(Key key) {
     root = remove_recursive(root, key);
+    check_invariants();
     return false;
 }
 
