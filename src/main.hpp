@@ -17,6 +17,8 @@ public:
     std::shared_ptr<node> left;
     std::shared_ptr<node> right;
     std::weak_ptr<node> parent;
+    std::weak_ptr<node> prev;
+    std::weak_ptr<node> next;
     int height;
 
     node(Key k, Value v);
@@ -72,6 +74,12 @@ void node<Key, Value>::check_invariants(std::shared_ptr<const node> node) {
         assert(node->right->key > node->key);
         check_invariants(node->right);
     }
+    if (node->next.lock()) {
+        assert(node->key < node->next.lock()->key); 
+    }
+    if (node->prev.lock()) {
+        assert(node->key > node->prev.lock()->key); 
+    }
 
     // Check that heights are stored correctly
     assert(node->height == node->calculate_height());
@@ -104,6 +112,8 @@ private:
     std::shared_ptr<node<Key, Value>> root;
     std::shared_ptr<node<Key, Value>>
     insert_recursive(std::shared_ptr<node<Key, Value>> current,
+                     std::weak_ptr<node<Key, Value>> prev,
+                     std::weak_ptr<node<Key, Value>> next,
                      Key key,
                      Value value
                      );
@@ -152,17 +162,22 @@ template <typename Key, typename Value>
 std::shared_ptr<node<Key, Value>>
 avl_map<Key, Value>::insert_recursive(
                                       std::shared_ptr<node<Key, Value>> current,
+                                      std::weak_ptr<node<Key, Value>> prev,
+                                      std::weak_ptr<node<Key, Value>> next,
                                       Key key,
                                       Value value
                                       ) {
     if (current == nullptr) {
-        return std::make_shared<node<Key, Value>>(key, value);
+        auto new_node = std::make_shared<node<Key, Value>>(key, value);
+        new_node->prev = prev;
+        new_node->next = next;
+        return new_node;
     }
 
     auto res = key <=> current->key;
 
     if (res == std::weak_ordering::less) {
-        auto new_left = insert_recursive(current->left, key, value);
+        auto new_left = insert_recursive(current->left, prev, current, key, value);
         current->left = new_left;
         current->left->parent = current;
         current->update_height();
@@ -179,7 +194,7 @@ avl_map<Key, Value>::insert_recursive(
             return current;
         }
     } else if (res == std::weak_ordering::greater) {
-        auto new_right = insert_recursive(current->right, key, value);
+        auto new_right = insert_recursive(current->right, current, next, key, value);
         current->right = new_right;
         current->right->parent = current;
         current->update_height();
@@ -256,7 +271,11 @@ avl_map<Key, Value>::right_rotate(std::shared_ptr<node<Key, Value>> old_top) {
 
 template <typename Key, typename Value>
 void avl_map<Key, Value>::insert(Key key, Value value) {
-    root = insert_recursive(root, key, value);
+    root = insert_recursive(root,
+                            std::weak_ptr<node<Key, Value>>(),
+                            std::weak_ptr<node<Key, Value>>(),
+                            key,
+                            value);
     check_invariants();
 }
 
