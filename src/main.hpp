@@ -75,8 +75,6 @@ void node<Key, Value>::check_invariants(std::shared_ptr<const node> node) {
         }
 
         // Check that heights are stored correctly
-        // Wasteful to calculate for each node for each recursive call
-        // to check_invariants(), but it seems to be fast enough.
         assert(node->height == node->calculate_height());
 
         assert(balance(node) == -1 ||
