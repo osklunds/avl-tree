@@ -82,6 +82,7 @@ void node<Key, Value>::check_invariants(std::shared_ptr<const node> node) {
         assert(node->key > node->prev.lock()->key); 
         assert(node->prev.lock()->next.lock() == node);
     }
+    // todo: delete
 
     // Check that heights are stored correctly
     assert(node->height == node->calculate_height());
