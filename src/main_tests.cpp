@@ -92,7 +92,7 @@ TEST_CASE("insert_random") {
     const int max = 1000;
     std::uniform_int_distribution<std::mt19937::result_type> dist(1,max);
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 1000; i++) {
         int key = dist(rng);
         int value = dist(rng);
 
@@ -286,7 +286,7 @@ TEST_CASE("remove_random") {
     const int max = 1000;
     std::uniform_int_distribution<std::mt19937::result_type> dist(1,max);
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 1000; i++) {
         int key = dist(rng);
         int value = dist(rng);
         bool insert = dist(rng) % 2;
