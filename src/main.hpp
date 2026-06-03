@@ -124,7 +124,7 @@ private:
 public:
     std::optional<Value> find(Key key) const;
     void insert(Key key, Value value);
-    bool remove(Key key);
+    void remove(Key key);
     void check_invariants() const;
 
     // todo:
@@ -265,11 +265,9 @@ void avl_map<Key, Value>::insert(Key key, Value value) {
 }
 
 template <typename Key, typename Value>
-bool avl_map<Key, Value>::remove(Key key) {
+void avl_map<Key, Value>::remove(Key key) {
     root = remove_recursive(root, key);
     node<Key, Value>::check_invariants(root);
-    // todo
-    return false;
 }
 
 template <typename Key, typename Value>

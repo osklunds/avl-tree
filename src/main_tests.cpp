@@ -172,8 +172,6 @@ TEST_CASE("remove_no_children") {
     REQUIRE(map.find(11) == 1100);
     REQUIRE(map.find(12) == 1200);
 
-    // REQUIRE(map.remove(10));
-    // REQUIRE(!map.remove(10));
     map.remove(10);
 
     REQUIRE(map.find(10) == std::nullopt);
