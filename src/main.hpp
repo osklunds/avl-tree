@@ -261,13 +261,13 @@ avl_map<Key, Value>::right_rotate(std::shared_ptr<node<Key, Value>> old_top) {
 template <typename Key, typename Value>
 void avl_map<Key, Value>::insert(Key key, Value value) {
     root = insert_recursive(root, key, value);
-    node<Key, Value>::check_invariants(root);
+    check_invariants();
 }
 
 template <typename Key, typename Value>
 void avl_map<Key, Value>::remove(Key key) {
     root = remove_recursive(root, key);
-    node<Key, Value>::check_invariants(root);
+    check_invariants();
 }
 
 template <typename Key, typename Value>
