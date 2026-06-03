@@ -16,6 +16,9 @@ public:
 
     std::shared_ptr<node> left;
     std::shared_ptr<node> right;
+
+    // Since I'm careful with pointers, maybe these could be shared_ptr
+    // after all.
     std::weak_ptr<node> parent;
     std::weak_ptr<node> prev;
     std::weak_ptr<node> next;
@@ -81,6 +84,7 @@ void node<Key, Value>::check_invariants(std::shared_ptr<const node> node) {
         check_invariants(node->right);
     }
     assert(node->next.lock());
+    // todo: Need to handle min and max
     // assert(node->key < node->next.lock()->key);
     assert(node->next.lock()->prev.lock() == node);
 
@@ -131,6 +135,8 @@ private:
                      );
     std::shared_ptr<node<Key, Value>>
     remove_recursive(std::shared_ptr<node<Key, Value>> current,
+                     std::weak_ptr<node<Key, Value>> prev,
+                     std::weak_ptr<node<Key, Value>> next,
                      Key key
                      );
 
@@ -138,6 +144,10 @@ private:
     left_rotate(std::shared_ptr<node<Key, Value>> current);
     std::shared_ptr<node<Key, Value>>
     right_rotate(std::shared_ptr<node<Key, Value>> current);
+
+    void make_nodes_neighbors(std::weak_ptr<node<Key, Value>> prev,
+                              std::weak_ptr<node<Key, Value>> next
+                              );
 
 public:
     std::optional<Value> find(Key key) const;
@@ -306,28 +316,31 @@ void avl_map<Key, Value>::insert(Key key, Value value) {
 
 template <typename Key, typename Value>
 void avl_map<Key, Value>::remove(Key key) {
-    root = remove_recursive(root, key);
+    root = remove_recursive(root, min, max, key);
     check_invariants();
 }
 
 template <typename Key, typename Value>
 std::shared_ptr<node<Key, Value>>
 avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
+                                      std::weak_ptr<node<Key, Value>> prev,
+                                      std::weak_ptr<node<Key, Value>> next,
                                       Key key) {
     if (current == nullptr) {
+        make_nodes_neighbors(prev, next);
         return nullptr;
     }
 
     auto res = key <=> current->key;
 
     if (res == std::weak_ordering::less) {
-        auto new_left = remove_recursive(current->left, key);
+        auto new_left = remove_recursive(current->left, prev, current, key);
         current->left = new_left;
         if (current->left) {
             current->left->parent = current;
         }
     } else if (res == std::weak_ordering::greater) {
-        auto new_right = remove_recursive(current->right, key);
+        auto new_right = remove_recursive(current->right, current, next, key);
         current->right = new_right;
         if (current->right) {
             current->right->parent = current;
@@ -347,7 +360,7 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
 
             auto new_key = smallest_right->key;
             auto new_value = smallest_right->value;
-            current->right = remove_recursive(current->right, new_key);
+            current->right = remove_recursive(current->right, current, next, new_key);
             if (current->right) {
                 current->right->parent = current;
             }
@@ -355,11 +368,14 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
             current->value = new_value;
         } else if (current->left && !current->right) {
             current->left->parent = current->parent;
+            make_nodes_neighbors(current->left, next);
             return current->left;
         } else if (!current->left && current->right) {
             current->right->parent = current->parent;
+            make_nodes_neighbors(prev, current->right);
             return current->right;
         } else {
+            make_nodes_neighbors(prev, next);
             return nullptr;
         }
     }
@@ -384,9 +400,15 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
         }
     }
 
-
-
     return current;
+}
+
+template <typename Key, typename Value>
+void avl_map<Key, Value>::make_nodes_neighbors(std::weak_ptr<node<Key, Value>> prev,
+                                               std::weak_ptr<node<Key, Value>> next
+                                               ) {
+    prev.lock()->next = next;
+    next.lock()->prev = prev;
 }
 
 template <typename Key, typename Value>
