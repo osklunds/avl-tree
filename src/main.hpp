@@ -75,10 +75,12 @@ void node<Key, Value>::check_invariants(std::shared_ptr<const node> node) {
         check_invariants(node->right);
     }
     if (node->next.lock()) {
-        assert(node->key < node->next.lock()->key); 
+        assert(node->key < node->next.lock()->key);
+        assert(node->next.lock()->prev.lock() == node);
     }
     if (node->prev.lock()) {
         assert(node->key > node->prev.lock()->key); 
+        assert(node->prev.lock()->next.lock() == node);
     }
 
     // Check that heights are stored correctly
@@ -171,6 +173,14 @@ avl_map<Key, Value>::insert_recursive(
         auto new_node = std::make_shared<node<Key, Value>>(key, value);
         new_node->prev = prev;
         new_node->next = next;
+
+        if (prev.lock()) {
+            prev.lock()->next = new_node;
+        }
+        if (next.lock()) {
+            next.lock()->prev = new_node;
+        }
+
         return new_node;
     }
 
