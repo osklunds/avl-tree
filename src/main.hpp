@@ -21,6 +21,7 @@ public:
     std::weak_ptr<node> next;
     int height;
 
+    node();
     node(Key k, Value v);
 
     static int height_maybe(std::shared_ptr<const node> node);
@@ -31,6 +32,11 @@ public:
     static void check_invariants(std::shared_ptr<const node> node);
     int calculate_height() const;
 };
+
+template <typename Key, typename Value>
+node<Key, Value>::node() {
+    height = 1;
+}
 
 template <typename Key, typename Value>
 node<Key, Value>::node(Key k, Value v) {
@@ -74,14 +80,14 @@ void node<Key, Value>::check_invariants(std::shared_ptr<const node> node) {
         assert(node->right->key > node->key);
         check_invariants(node->right);
     }
-    if (node->next.lock()) {
-        assert(node->key < node->next.lock()->key);
-        assert(node->next.lock()->prev.lock() == node);
-    }
-    if (node->prev.lock()) {
-        assert(node->key > node->prev.lock()->key); 
-        assert(node->prev.lock()->next.lock() == node);
-    }
+    assert(node->next.lock());
+    // assert(node->key < node->next.lock()->key);
+    assert(node->next.lock()->prev.lock() == node);
+
+    assert(node->prev.lock());
+    // assert(node->key > node->prev.lock()->key); 
+    assert(node->prev.lock()->next.lock() == node);
+
     // todo: deletion. There must always be a prev and next
 
     // Check that heights are stored correctly
@@ -113,6 +119,9 @@ template <typename Key, typename Value>
 class avl_map {
 private:
     std::shared_ptr<node<Key, Value>> root;
+    std::shared_ptr<node<Key, Value>> min;
+    std::shared_ptr<node<Key, Value>> max;
+
     std::shared_ptr<node<Key, Value>>
     insert_recursive(std::shared_ptr<node<Key, Value>> current,
                      std::weak_ptr<node<Key, Value>> prev,
@@ -136,11 +145,20 @@ public:
     void remove(Key key);
     void check_invariants() const;
 
+    avl_map();
+
+
     // todo:
     // compare
     // iterator
     // min/max
 };
+
+template <typename Key, typename Value>
+avl_map<Key, Value>::avl_map() {
+    min = std::make_shared<node<Key, Value>>();
+    max = std::make_shared<node<Key, Value>>();
+}
 
 // todo: consider to merge with insert/delete
 template <typename Key, typename Value>
@@ -173,14 +191,10 @@ avl_map<Key, Value>::insert_recursive(
     if (current == nullptr) {
         auto new_node = std::make_shared<node<Key, Value>>(key, value);
         new_node->prev = prev;
-        new_node->next = next;
+        prev.lock()->next = new_node;
 
-        if (prev.lock()) {
-            prev.lock()->next = new_node;
-        }
-        if (next.lock()) {
-            next.lock()->prev = new_node;
-        }
+        new_node->next = next;
+        next.lock()->prev = new_node;
 
         return new_node;
     }
@@ -283,8 +297,8 @@ avl_map<Key, Value>::right_rotate(std::shared_ptr<node<Key, Value>> old_top) {
 template <typename Key, typename Value>
 void avl_map<Key, Value>::insert(Key key, Value value) {
     root = insert_recursive(root,
-                            std::weak_ptr<node<Key, Value>>(),
-                            std::weak_ptr<node<Key, Value>>(),
+                            min,
+                            max,
                             key,
                             value);
     check_invariants();
