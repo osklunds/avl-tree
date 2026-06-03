@@ -62,26 +62,24 @@ void node<Key, Value>::update_height() {
 
 template <typename Key, typename Value>
 void node<Key, Value>::check_invariants(std::shared_ptr<const node> node) {
-    if (node) {
-        if (node->left) {
-            assert(node->left->parent.lock() == node);
-            assert(node->left->key < node->key);
-            check_invariants(node->left);
-        }
-        if (node->right) {
-            assert(node->right->parent.lock() == node);
-            assert(node->right->key > node->key);
-            check_invariants(node->right);
-        }
-
-        // Check that heights are stored correctly
-        assert(node->height == node->calculate_height());
-
-        assert(balance(node) == -1 ||
-               balance(node) == 0 ||
-               balance(node) == 1
-               );
+    if (node->left) {
+        assert(node->left->parent.lock() == node);
+        assert(node->left->key < node->key);
+        check_invariants(node->left);
     }
+    if (node->right) {
+        assert(node->right->parent.lock() == node);
+        assert(node->right->key > node->key);
+        check_invariants(node->right);
+    }
+
+    // Check that heights are stored correctly
+    assert(node->height == node->calculate_height());
+
+    assert(balance(node) == -1 ||
+           balance(node) == 0 ||
+           balance(node) == 1
+           );
 }
 
 template <typename Key, typename Value>
