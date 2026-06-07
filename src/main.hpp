@@ -17,8 +17,8 @@ public:
     std::shared_ptr<node> left;
     std::shared_ptr<node> right;
 
-    // Since I'm careful with pointers, maybe these could be shared_ptr
-    // after all.
+    // Even if I'm careful with pointers, let's have these as weak_ptr to be
+    // on the safe side. It avoids silent memory leaks.
     std::weak_ptr<node> parent;
     std::weak_ptr<node> prev;
     std::weak_ptr<node> next;
