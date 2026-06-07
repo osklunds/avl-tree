@@ -367,5 +367,61 @@ TEST_CASE("min_max_fixed") {
 
     REQUIRE(map.get_min() == std::make_tuple(9,90));
     REQUIRE(map.get_max() == std::make_tuple(12,120));
+}
 
+TEST_CASE("min_max_random") {
+    signal(SIGSEGV, handler);
+
+    avl_map<int, int> avl_map{};
+    std::map<int, int> map{};
+
+    std::random_device dev;
+    std::mt19937 rng(dev());
+    const int max = 1000;
+    std::uniform_int_distribution<std::mt19937::result_type> dist(1,max);
+
+    for (int i = 0; i < 1000; i++) {
+        int key = dist(rng);
+        int value = dist(rng);
+        bool insert = dist(rng) % 2;
+
+        if (insert) {
+            avl_map.insert(key, value);
+            map.erase(key);
+            map.insert({key, value});
+        } else {
+            avl_map.remove(key);
+            map.erase(key);
+        }
+
+        for (int j = 0; j < max; j++) {
+            auto exp_value = map.find(j);
+            auto value = avl_map.find(j);
+            if (exp_value == map.end()) {
+                REQUIRE(value == std::nullopt);
+            } else {
+                int v = std::get<1>(*exp_value);
+                REQUIRE(value == std::optional<int>(v));
+            }
+        }
+
+        if (map.size() == 0) {
+            REQUIRE(avl_map.get_min() == std::nullopt);
+            REQUIRE(avl_map.get_max() == std::nullopt);
+        } else if (map.size() == 1) {
+            auto elem = map.begin();
+            auto elem2 = std::make_tuple(elem->first, elem->second);
+            REQUIRE(avl_map.get_min() == elem2);
+            REQUIRE(avl_map.get_max() == elem2);
+        } else {
+            auto min = map.begin();
+            auto min2 = std::make_tuple(min->first, min->second);
+            REQUIRE(avl_map.get_min() == min2);
+
+            auto max = map.end();
+            max--;
+            auto max2 = std::make_tuple(max->first, max->second);
+            REQUIRE(avl_map.get_max() == max2);
+        }
+    }
 }
