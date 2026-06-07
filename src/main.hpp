@@ -162,6 +162,10 @@ public:
     // compare
     // iterator
     // min/max
+    // get min get max
+    // size
+    // print map
+    // print node
 };
 
 template <typename Key, typename Value>
