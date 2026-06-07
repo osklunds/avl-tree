@@ -172,6 +172,9 @@ template <typename Key, typename Value>
 avl_map<Key, Value>::avl_map() {
     min = std::make_shared<node<Key, Value>>();
     max = std::make_shared<node<Key, Value>>();
+    make_nodes_neighbors(min, max);
+
+    check_invariants();
 }
 
 // todo: consider to merge with insert/delete

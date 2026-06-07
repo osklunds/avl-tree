@@ -275,6 +275,33 @@ TEST_CASE("remove_rotate") {
     REQUIRE(map.find(12) == std::nullopt);
 }
 
+TEST_CASE("remove_edge_cases") {
+    avl_map<int, int> map{};
+
+    map.insert(11, 1100);
+    REQUIRE(map.find(11) == 1100);
+    REQUIRE(map.find(12) == std::nullopt);
+
+    // Remove not found
+    map.remove(12);
+
+    REQUIRE(map.find(11) == 1100);
+    REQUIRE(map.find(12) == std::nullopt);
+
+    // Remove last
+    map.remove(11);
+
+    REQUIRE(map.find(11) == std::nullopt);
+    REQUIRE(map.find(12) == std::nullopt);
+
+    // Remove when empty
+    map.remove(13);
+
+    REQUIRE(map.find(11) == std::nullopt);
+    REQUIRE(map.find(12) == std::nullopt);
+    REQUIRE(map.find(13) == std::nullopt);
+}
+
 TEST_CASE("remove_random") {
     signal(SIGSEGV, handler);
 
