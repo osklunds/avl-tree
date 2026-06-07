@@ -135,8 +135,8 @@ private:
                      );
     std::shared_ptr<node<Key, Value>>
     remove_recursive(std::shared_ptr<node<Key, Value>> current,
-                     std::weak_ptr<node<Key, Value>> prev,
-                     std::weak_ptr<node<Key, Value>> next,
+                     std::shared_ptr<node<Key, Value>> prev,
+                     std::shared_ptr<node<Key, Value>> next,
                      Key key
                      );
 
@@ -145,8 +145,8 @@ private:
     std::shared_ptr<node<Key, Value>>
     right_rotate(std::shared_ptr<node<Key, Value>> current);
 
-    void make_nodes_neighbors(std::weak_ptr<node<Key, Value>> prev,
-                              std::weak_ptr<node<Key, Value>> next
+    void make_nodes_neighbors(std::shared_ptr<node<Key, Value>> prev,
+                              std::shared_ptr<node<Key, Value>> next
                               );
 
 public:
@@ -330,8 +330,8 @@ void avl_map<Key, Value>::remove(Key key) {
 template <typename Key, typename Value>
 std::shared_ptr<node<Key, Value>>
 avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
-                                      std::weak_ptr<node<Key, Value>> prev,
-                                      std::weak_ptr<node<Key, Value>> next,
+                                      std::shared_ptr<node<Key, Value>> prev,
+                                      std::shared_ptr<node<Key, Value>> next,
                                       Key key) {
     if (current == nullptr) {
         make_nodes_neighbors(prev, next);
@@ -411,11 +411,11 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
 }
 
 template <typename Key, typename Value>
-void avl_map<Key, Value>::make_nodes_neighbors(std::weak_ptr<node<Key, Value>> prev,
-                                               std::weak_ptr<node<Key, Value>> next
+void avl_map<Key, Value>::make_nodes_neighbors(std::shared_ptr<node<Key, Value>> prev,
+                                               std::shared_ptr<node<Key, Value>> next
                                                ) {
-    prev.lock()->next = next;
-    next.lock()->prev = prev;
+    prev->next = next;
+    next->prev = prev;
 }
 
 template <typename Key, typename Value>
