@@ -7,6 +7,7 @@
 #include <cassert>
 #include <iostream>
 #include <algorithm>
+#include <utility>
 
 template <typename Key, typename Value>
 class node {
@@ -149,11 +150,18 @@ private:
                               std::shared_ptr<node<Key, Value>> next
                               );
 
+    void check_invariants() const;
+
 public:
     std::optional<Value> find(Key key) const;
     void insert(Key key, Value value);
     void remove(Key key);
-    void check_invariants() const;
+
+    std::optional<std::tuple<Key, Value>> get_min() const;
+    std::optional<std::tuple<Key, Value>> get_max() const;
+
+    std::optional<std::tuple<Key, Value>> take_min();
+    std::optional<std::tuple<Key, Value>> take_max();
 
     avl_map();
 
@@ -433,6 +441,26 @@ void avl_map<Key, Value>::check_invariants() const {
             
         current = next;
     }
+}
+
+template <typename Key, typename Value>
+std::optional<std::tuple<Key, Value>> avl_map<Key, Value>::get_min() const {
+    return std::nullopt;
+}
+
+template <typename Key, typename Value>
+std::optional<std::tuple<Key, Value>> avl_map<Key, Value>::get_max() const {
+    return std::nullopt;
+}
+
+template <typename Key, typename Value>
+std::optional<std::tuple<Key, Value>> avl_map<Key, Value>::take_min() {
+    return std::nullopt;
+}
+
+template <typename Key, typename Value>
+std::optional<std::tuple<Key, Value>> avl_map<Key, Value>::take_max() {
+    return std::nullopt;
 }
 
 #endif
