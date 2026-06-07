@@ -445,12 +445,20 @@ void avl_map<Key, Value>::check_invariants() const {
 
 template <typename Key, typename Value>
 std::optional<std::tuple<Key, Value>> avl_map<Key, Value>::get_min() const {
-    return std::nullopt;
+    if (root) {
+        return std::make_tuple(min->next.lock()->key, min->next.lock()->value);
+    } else {
+        return std::nullopt;
+    }
 }
 
 template <typename Key, typename Value>
 std::optional<std::tuple<Key, Value>> avl_map<Key, Value>::get_max() const {
-    return std::nullopt;
+    if (root) {
+        return std::make_tuple(max->prev.lock()->key, max->prev.lock()->value);
+    } else {
+        return std::nullopt;
+    }
 }
 
 template <typename Key, typename Value>

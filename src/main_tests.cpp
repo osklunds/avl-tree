@@ -339,3 +339,33 @@ TEST_CASE("remove_random") {
         }
     }
 }
+
+TEST_CASE("min_max_fixed") {
+    avl_map<int, int> map{};
+
+    REQUIRE(map.get_min() == std::nullopt);
+    REQUIRE(map.get_max() == std::nullopt);
+    REQUIRE(map.take_min() == std::nullopt);
+    REQUIRE(map.take_max() == std::nullopt);
+
+    map.insert(10, 100);
+
+    REQUIRE(map.get_min() == std::make_tuple(10,100));
+    REQUIRE(map.get_max() == std::make_tuple(10,100));
+
+    map.insert(11, 110);
+
+    REQUIRE(map.get_min() == std::make_tuple(10,100));
+    REQUIRE(map.get_max() == std::make_tuple(11,110));
+
+    map.insert(12, 120);
+
+    REQUIRE(map.get_min() == std::make_tuple(10,100));
+    REQUIRE(map.get_max() == std::make_tuple(12,120));
+
+    map.insert(9, 90);
+
+    REQUIRE(map.get_min() == std::make_tuple(9,90));
+    REQUIRE(map.get_max() == std::make_tuple(12,120));
+
+}
