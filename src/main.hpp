@@ -423,6 +423,16 @@ void avl_map<Key, Value>::check_invariants() const {
     if (root) {
         node<Key, Value>::check_invariants(root);
     }
+
+    std::shared_ptr<node<Key, Value>> current = min->next.lock();
+
+    while (current != max && current->next.lock() != max) {
+        std::shared_ptr<node<Key, Value>> next = current->next.lock();
+
+        assert(current->key < next->key);
+            
+        current = next;
+    }
 }
 
 #endif
