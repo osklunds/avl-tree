@@ -164,12 +164,26 @@ public:
 
     avl_map();
 
-
     // todo:
     // compare
     // iterator
     // print map
     // print node
+
+    class iterator {
+    private:
+        std::weak_ptr<node<Key, Value>> current;
+
+    public:
+        iterator(std::weak_ptr<node<Key, Value>>);
+
+        std::tuple<Key, Value> operator*() const;
+        iterator& operator++();
+        bool operator!=(const iterator& other) const;
+    };
+
+    iterator begin() const;
+    iterator end() const;
 };
 
 template <typename Key, typename Value>
@@ -489,5 +503,30 @@ template <typename Key, typename Value>
 int avl_map<Key, Value>::size() const {
     return size_;
 }
+
+template <typename Key, typename Value>
+avl_map<Key, Value>::iterator avl_map<Key, Value>::begin() const {
+    return iterator(min->next);
+}
+
+template <typename Key, typename Value>
+avl_map<Key, Value>::iterator avl_map<Key, Value>::end() const {
+    return iterator(max);
+}
+
+template <typename Key, typename Value>
+avl_map<Key, Value>::iterator::iterator(std::weak_ptr<node<Key, Value>> c) : current(c) {
+
+}
+
+template <typename Key, typename Value>
+std::tuple<Key, Value>
+avl_map<Key, Value>::iterator::operator*() const {
+    return std::make_tuple(current.lock()->key,
+                           current.lock()->value);
+}
+
+        // iterator& operator++();
+        // bool operator!=(const iterator& other) const;
 
 #endif

@@ -486,3 +486,13 @@ TEST_CASE("size_fixed") {
     map.remove(10);
     REQUIRE(map.size() == 0);
 }
+
+TEST_CASE("iterator_fixed") {
+    avl_map<int, int> map{};
+
+    map.insert(10, 1000);
+    map.insert(11, 1000);
+
+    auto x = map.begin();
+    REQUIRE(*x == std::make_tuple(10,1000));
+}
