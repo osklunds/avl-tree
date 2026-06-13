@@ -506,4 +506,9 @@ TEST_CASE("iterator_fixed") {
     ++it;
     REQUIRE(it != map.begin());
     REQUIRE(it == map.end());
+
+    for (auto x : map) {
+        REQUIRE(x == std::make_tuple(10,1000));
+        break;
+    }
 }
