@@ -491,8 +491,11 @@ TEST_CASE("iterator_fixed") {
     avl_map<int, int> map{};
 
     map.insert(10, 1000);
-    map.insert(11, 1000);
+    map.insert(11, 1100);
 
-    auto x = map.begin();
-    REQUIRE(*x == std::make_tuple(10,1000));
+    auto it = map.begin();
+    REQUIRE(*it == std::make_tuple(10,1000));
+
+    ++it;
+    REQUIRE(*it == std::make_tuple(11,1100));
 }

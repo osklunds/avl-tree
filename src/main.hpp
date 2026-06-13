@@ -526,7 +526,17 @@ avl_map<Key, Value>::iterator::operator*() const {
                            current.lock()->value);
 }
 
-        // iterator& operator++();
-        // bool operator!=(const iterator& other) const;
+template <typename Key, typename Value>
+avl_map<Key, Value>::iterator&
+avl_map<Key, Value>::iterator::operator++() {
+    current = current.lock()->next;
+    return *this;
+}
+
+// template <typename Key, typename Value>
+// bool
+// avl_map<Key, Value>::iterator::operator!=(const iterator& other) const {
+
+// }
 
 #endif
