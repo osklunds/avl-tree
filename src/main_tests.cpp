@@ -495,7 +495,15 @@ TEST_CASE("iterator_fixed") {
 
     auto it = map.begin();
     REQUIRE(*it == std::make_tuple(10,1000));
+    REQUIRE(it == map.begin());
+    REQUIRE(it != map.end());
 
     ++it;
     REQUIRE(*it == std::make_tuple(11,1100));
+    REQUIRE(it != map.begin());
+    REQUIRE(it != map.end());
+
+    ++it;
+    REQUIRE(it != map.begin());
+    REQUIRE(it == map.end());
 }

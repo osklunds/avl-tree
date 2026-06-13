@@ -179,6 +179,7 @@ public:
 
         std::tuple<Key, Value> operator*() const;
         iterator& operator++();
+        bool operator==(const iterator& other) const;
         bool operator!=(const iterator& other) const;
     };
 
@@ -533,10 +534,16 @@ avl_map<Key, Value>::iterator::operator++() {
     return *this;
 }
 
-// template <typename Key, typename Value>
-// bool
-// avl_map<Key, Value>::iterator::operator!=(const iterator& other) const {
+template <typename Key, typename Value>
+bool
+avl_map<Key, Value>::iterator::operator==(const iterator& other) const {
+    return current.lock() == other.current.lock();
+}
 
-// }
+template <typename Key, typename Value>
+bool
+avl_map<Key, Value>::iterator::operator!=(const iterator& other) const {
+    return !(*this == other);
+}
 
 #endif
