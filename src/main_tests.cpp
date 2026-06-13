@@ -518,3 +518,20 @@ TEST_CASE("iterator_fixed") {
         break;
     }
 }
+
+TEST_CASE("equal_fixed") {
+    avl_map<int, int> a{};
+    avl_map<int, int> b{};
+    REQUIRE(a == b);
+
+    a.insert(10, 1000);
+    a.insert(11, 1100);
+    REQUIRE(a != b);
+
+    b.insert(10, 1000);
+    b.insert(11, 1100);
+    REQUIRE(a == b);
+
+    a.insert(11, 1200);
+    REQUIRE(a != b);
+}

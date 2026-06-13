@@ -150,6 +150,8 @@ private:
     void check_invariants() const;
 
 public:
+    avl_map();
+
     std::optional<Value> find(Key key) const;
     void insert(Key key, Value value);
     void remove(Key key);
@@ -162,7 +164,8 @@ public:
 
     int size() const;
 
-    avl_map();
+    bool operator==(const avl_map& other) const;
+    bool operator!=(const avl_map& other) const;
 
     // todo:
     // compare
@@ -545,6 +548,28 @@ avl_map<Key, Value>::iterator::operator==(const iterator& other) const {
 template <typename Key, typename Value>
 bool
 avl_map<Key, Value>::iterator::operator!=(const iterator& other) const {
+    return !(*this == other);
+}
+
+template <typename Key, typename Value>
+bool avl_map<Key, Value>::operator==(const avl_map& other) const{
+    if (size() != other.size()) {
+        return false;
+    }
+
+    auto it_other = other.begin();
+    for (auto it_this = begin(); it_this != end(); ++it_this) {
+        if (*it_this != *it_other) {
+            return false;
+        }
+        ++it_other;
+    }
+
+    return true;
+}
+
+template <typename Key, typename Value>
+bool avl_map<Key, Value>::operator!=(const avl_map& other) const {
     return !(*this == other);
 }
 
