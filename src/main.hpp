@@ -122,6 +122,7 @@ private:
     std::shared_ptr<node<Key, Value>> root;
     std::shared_ptr<node<Key, Value>> min;
     std::shared_ptr<node<Key, Value>> max;
+    int size_;
 
     std::shared_ptr<node<Key, Value>>
     insert_recursive(std::shared_ptr<node<Key, Value>> current,
@@ -159,13 +160,14 @@ public:
     std::optional<std::tuple<Key, Value>> take_min();
     std::optional<std::tuple<Key, Value>> take_max();
 
+    int size() const;
+
     avl_map();
 
 
     // todo:
     // compare
     // iterator
-    // size
     // print map
     // print node
 };
@@ -175,6 +177,7 @@ avl_map<Key, Value>::avl_map() {
     min = std::make_shared<node<Key, Value>>();
     max = std::make_shared<node<Key, Value>>();
     make_nodes_neighbors(min, max);
+    size_ = 0;
 
     check_invariants();
 }
@@ -214,6 +217,8 @@ avl_map<Key, Value>::insert_recursive(
 
         new_node->next = next;
         next.lock()->prev = new_node;
+
+        size_++;
 
         return new_node;
     }
@@ -335,6 +340,7 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
                                       std::shared_ptr<node<Key, Value>> prev,
                                       std::shared_ptr<node<Key, Value>> next,
                                       Key key) {
+    // The case when the object to be deleted isn't part of the tree.
     if (current == nullptr) {
         make_nodes_neighbors(prev, next);
         return nullptr;
@@ -378,13 +384,16 @@ avl_map<Key, Value>::remove_recursive(std::shared_ptr<node<Key, Value>> current,
         } else if (current->left && !current->right) {
             current->left->parent = current->parent;
             make_nodes_neighbors(current->left, next);
+            size_--;
             return current->left;
         } else if (!current->left && current->right) {
             current->right->parent = current->parent;
             make_nodes_neighbors(prev, current->right);
+            size_--;
             return current->right;
         } else {
             make_nodes_neighbors(prev, next);
+            size_--;
             return nullptr;
         }
     }
@@ -474,6 +483,11 @@ std::optional<std::tuple<Key, Value>> avl_map<Key, Value>::take_max() {
     }
 
     return m;
+}
+
+template <typename Key, typename Value>
+int avl_map<Key, Value>::size() const {
+    return size_;
 }
 
 #endif

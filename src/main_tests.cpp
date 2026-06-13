@@ -171,12 +171,14 @@ TEST_CASE("remove_no_children") {
     REQUIRE(map.find(10) == 1000);
     REQUIRE(map.find(11) == 1100);
     REQUIRE(map.find(12) == 1200);
+    REQUIRE(map.size() == 3);
 
     map.remove(10);
 
     REQUIRE(map.find(10) == std::nullopt);
     REQUIRE(map.find(11) == 1100);
     REQUIRE(map.find(12) == 1200);
+    REQUIRE(map.size() == 2);
 }
 
 TEST_CASE("remove_left_child") {
@@ -195,6 +197,7 @@ TEST_CASE("remove_left_child") {
     REQUIRE(map.find(10) == 1000);
     REQUIRE(map.find(11) == 1100);
     REQUIRE(map.find(12) == 1200);
+    REQUIRE(map.size() == 4);
 
     map.remove(10);
 
@@ -202,6 +205,7 @@ TEST_CASE("remove_left_child") {
     REQUIRE(map.find(10) == std::nullopt);
     REQUIRE(map.find(11) == 1100);
     REQUIRE(map.find(12) == 1200);
+    REQUIRE(map.size() == 3);
 }
 
 TEST_CASE("remove_right_child") {
@@ -220,6 +224,7 @@ TEST_CASE("remove_right_child") {
     REQUIRE(map.find(11) == 1100);
     REQUIRE(map.find(12) == 1200);
     REQUIRE(map.find(13) == 1300);
+    REQUIRE(map.size() == 4);
 
     map.remove(12);
 
@@ -227,6 +232,7 @@ TEST_CASE("remove_right_child") {
     REQUIRE(map.find(11) == 1100);
     REQUIRE(map.find(12) == std::nullopt);
     REQUIRE(map.find(13) == 1300);
+    REQUIRE(map.size() == 3);
 }
 
 TEST_CASE("remove_two_children") {
@@ -242,12 +248,14 @@ TEST_CASE("remove_two_children") {
     REQUIRE(map.find(10) == 1000);
     REQUIRE(map.find(11) == 1100);
     REQUIRE(map.find(12) == 1200);
+    REQUIRE(map.size() == 3);
 
     map.remove(11);
 
     REQUIRE(map.find(10) == 1000);
     REQUIRE(map.find(11) == std::nullopt);
     REQUIRE(map.find(12) == 1200);
+    REQUIRE(map.size() == 2);
 }
 
 TEST_CASE("remove_rotate") {
@@ -266,6 +274,7 @@ TEST_CASE("remove_rotate") {
     REQUIRE(map.find(10) == 1000);
     REQUIRE(map.find(11) == 1100);
     REQUIRE(map.find(12) == 1200);
+    REQUIRE(map.size() == 4);
 
     map.remove(12);
 
@@ -273,6 +282,7 @@ TEST_CASE("remove_rotate") {
     REQUIRE(map.find(10) == 1000);
     REQUIRE(map.find(11) == 1100);
     REQUIRE(map.find(12) == std::nullopt);
+    REQUIRE(map.size() == 3);
 }
 
 TEST_CASE("remove_edge_cases") {
@@ -281,18 +291,21 @@ TEST_CASE("remove_edge_cases") {
     map.insert(11, 1100);
     REQUIRE(map.find(11) == 1100);
     REQUIRE(map.find(12) == std::nullopt);
+    REQUIRE(map.size() == 1);
 
     // Remove not found
     map.remove(12);
 
     REQUIRE(map.find(11) == 1100);
     REQUIRE(map.find(12) == std::nullopt);
+    REQUIRE(map.size() == 1);
 
     // Remove last
     map.remove(11);
 
     REQUIRE(map.find(11) == std::nullopt);
     REQUIRE(map.find(12) == std::nullopt);
+    REQUIRE(map.size() == 0);
 
     // Remove when empty
     map.remove(13);
@@ -300,6 +313,7 @@ TEST_CASE("remove_edge_cases") {
     REQUIRE(map.find(11) == std::nullopt);
     REQUIRE(map.find(12) == std::nullopt);
     REQUIRE(map.find(13) == std::nullopt);
+    REQUIRE(map.size() == 0);
 }
 
 TEST_CASE("remove_random") {
@@ -337,6 +351,8 @@ TEST_CASE("remove_random") {
                 REQUIRE(value == std::optional<int>(v));
             }
         }
+
+        REQUIRE(avl_map.size() == map.size());
     }
 }
 
@@ -445,5 +461,28 @@ TEST_CASE("take_min_max_fixed") {
 
     REQUIRE(map.take_max() == std::nullopt);
     REQUIRE(map.take_min() == std::nullopt);
+}
 
+TEST_CASE("size_fixed") {
+    avl_map<int, int> map{};
+
+    REQUIRE(map.size() == 0);
+
+    map.insert(10, 1000);
+    REQUIRE(map.size() == 1);
+
+    map.insert(10, 1000);
+    REQUIRE(map.size() == 1);
+
+    map.insert(11, 1000);
+    REQUIRE(map.size() == 2);
+
+    map.remove(12);
+    REQUIRE(map.size() == 2);
+
+    map.remove(11);
+    REQUIRE(map.size() == 1);
+
+    map.remove(10);
+    REQUIRE(map.size() == 0);
 }
