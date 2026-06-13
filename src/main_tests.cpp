@@ -345,8 +345,6 @@ TEST_CASE("min_max_fixed") {
 
     REQUIRE(map.get_min() == std::nullopt);
     REQUIRE(map.get_max() == std::nullopt);
-    REQUIRE(map.take_min() == std::nullopt);
-    REQUIRE(map.take_max() == std::nullopt);
 
     map.insert(10, 100);
 
@@ -424,4 +422,28 @@ TEST_CASE("min_max_random") {
             REQUIRE(avl_map.get_max() == max2);
         }
     }
+}
+
+TEST_CASE("take_min_max_fixed") {
+    avl_map<int, int> map{};
+
+    map.insert(9, 90);
+    map.insert(11, 110);
+    map.insert(10, 100);
+    map.insert(12, 120);
+
+    REQUIRE(map.take_min() == std::make_tuple(9,90));
+    REQUIRE(map.take_min() == std::make_tuple(10,100));
+    REQUIRE(map.take_max() == std::make_tuple(12,120));
+
+    REQUIRE(map.find(9) == std::nullopt);
+    REQUIRE(map.find(10) == std::nullopt);
+    REQUIRE(map.find(11) == 110);
+    REQUIRE(map.find(12) == std::nullopt);
+
+    REQUIRE(map.take_max() == std::make_tuple(11,110));
+
+    REQUIRE(map.take_max() == std::nullopt);
+    REQUIRE(map.take_min() == std::nullopt);
+
 }

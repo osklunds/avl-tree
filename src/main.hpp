@@ -169,8 +169,6 @@ public:
     // todo:
     // compare
     // iterator
-    // min/max
-    // get min get max
     // size
     // print map
     // print node
@@ -463,12 +461,23 @@ std::optional<std::tuple<Key, Value>> avl_map<Key, Value>::get_max() const {
 
 template <typename Key, typename Value>
 std::optional<std::tuple<Key, Value>> avl_map<Key, Value>::take_min() {
-    return std::nullopt;
+    // This is O(log n). Maybe O(1) is possible, but for now, I take the easy way
+    auto m = get_min();
+    if (m) {
+        remove(std::get<0>(m.value()));
+    }
+
+    return m;
 }
 
 template <typename Key, typename Value>
 std::optional<std::tuple<Key, Value>> avl_map<Key, Value>::take_max() {
-    return std::nullopt;
+    auto m = get_max();
+    if (m) {
+        remove(std::get<0>(m.value()));
+    }
+
+    return m;
 }
 
 #endif
