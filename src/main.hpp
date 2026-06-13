@@ -166,10 +166,12 @@ public:
 
     // todo:
     // compare
-    // iterator
     // print map
     // print node
 
+    // Note: there are many potential iterator variants that could be implemented
+    // Ex: const ref, ref to value, dfs, bfs
+    // Current is copy and in-order
     class iterator {
     private:
         std::weak_ptr<node<Key, Value>> current;
