@@ -168,7 +168,6 @@ public:
     bool operator!=(const avl_map& other) const;
 
     // todo:
-    // compare
     // print map
     // print node
 
