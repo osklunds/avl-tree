@@ -353,6 +353,12 @@ TEST_CASE("remove_random") {
         }
 
         REQUIRE(avl_map.size() == map.size());
+
+        std::map<int, int> map_from_iterator{};
+        for (auto x : avl_map) {
+            map_from_iterator.insert({std::get<0>(x), std::get<1>(x)});
+        }
+        REQUIRE(map == map_from_iterator);
     }
 }
 
