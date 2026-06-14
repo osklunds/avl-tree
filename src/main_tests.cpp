@@ -552,3 +552,20 @@ TEST_CASE("equal_fixed") {
     a.insert(12, 1);
     REQUIRE(a == b);
 }
+
+TEST_CASE("pretty_print") {
+    avl_map<int, int> a{};
+
+    a.insert(1, 10);
+    a.insert(2, 20);
+    a.insert(3, 30);
+    a.insert(4, 40);
+    a.insert(5, 40);
+    a.insert(6, 40);
+    a.insert(7, 40);
+    a.insert(8, 40);
+    a.insert(9, 40);
+    a.insert(10, 40);
+
+    std::cout << "oskar: " << a.pretty_print() << std::endl;
+}

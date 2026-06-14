@@ -8,6 +8,7 @@
 #include <iostream>
 #include <algorithm>
 #include <utility>
+#include <sstream>
 
 template <typename Key, typename Value>
 class node {
@@ -149,6 +150,12 @@ private:
 
     void check_invariants() const;
 
+    void
+    build_pretty_print_data(std::shared_ptr<node<Key, Value>> curr,
+                            std::string index,
+                            avl_map<std::string, std::string>& data
+                            ) const;
+
 public:
     avl_map();
 
@@ -163,6 +170,8 @@ public:
     std::optional<std::tuple<Key, Value>> take_max();
 
     int size() const;
+
+    std::string pretty_print() const;
 
     bool operator==(const avl_map& other) const;
     bool operator!=(const avl_map& other) const;
@@ -572,6 +581,34 @@ bool avl_map<Key, Value>::operator==(const avl_map& other) const{
 template <typename Key, typename Value>
 bool avl_map<Key, Value>::operator!=(const avl_map& other) const {
     return !(*this == other);
+}
+
+template <typename Key, typename Value>
+std::string avl_map<Key, Value>::pretty_print() const {
+    avl_map<std::string, std::string> data = avl_map<std::string, std::string>{};
+    build_pretty_print_data(root, "", data);
+
+    for (auto x : data) {
+        std::cout << "oskar: " << std::get<0>(x) << " " << std::get<1>(x) << std::endl;
+    }
+
+    return "";
+}
+
+template <typename Key, typename Value>
+void
+avl_map<Key, Value>::build_pretty_print_data(std::shared_ptr<node<Key, Value>> curr,
+                                             std::string index,
+                                             avl_map<std::string, std::string>& data
+                                             ) const {
+    if (curr) {
+        std::ostringstream string_stream;
+        string_stream << curr->key; // todo: include value, and move to Node
+        data.insert(index, string_stream.str());
+
+        build_pretty_print_data(curr->left, index + "L", data);
+        build_pretty_print_data(curr->right, index + "R", data);
+    }
 }
 
 #endif
