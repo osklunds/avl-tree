@@ -534,4 +534,21 @@ TEST_CASE("equal_fixed") {
 
     a.insert(11, 1200);
     REQUIRE(a != b);
+
+    b.insert(11, 1200);
+    REQUIRE(a == b);
+
+    // To test when the internal tree is different
+    // due to different insert order
+    b.insert(12, 1);
+    b.insert(13, 1);
+    b.insert(14, 1);
+    b.insert(15, 1);
+    REQUIRE(a != b);
+
+    a.insert(15, 1);
+    a.insert(14, 1);
+    a.insert(13, 1);
+    a.insert(12, 1);
+    REQUIRE(a == b);
 }
