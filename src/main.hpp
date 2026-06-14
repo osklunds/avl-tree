@@ -463,6 +463,8 @@ void avl_map<Key, Value>::check_invariants() const {
             
         current = next;
     }
+
+    // todo: consider if size should be checked as part of invariants
 }
 
 template <typename Key, typename Value>
