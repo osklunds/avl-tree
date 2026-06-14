@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <utility>
 #include <sstream>
+#include <compare>
+#include <vector>
 
 template <typename Key, typename Value>
 class node {
@@ -150,10 +152,33 @@ private:
 
     void check_invariants() const;
 
+    // Custom class to have special ordering
+    class pretty_print_index {
+    private:
+        std::vector<bool, std::allocator<bool>> index;
+
+    public:
+        pretty_print_index append(bool left_or_right) const;
+
+        std::strong_ordering operator<=>(const pretty_print_index& other) const;
+        friend std::ostream& operator<<(std::ostream& out,
+                                        const pretty_print_index& index) {
+            for (bool i : index.index) {
+                if (i) {
+                    out << "R";
+                } else {
+                    out << "L";
+                }
+            }
+
+            return out;
+        }
+    };
+
     void
     build_pretty_print_data(std::shared_ptr<node<Key, Value>> curr,
-                            std::string index,
-                            avl_map<std::string, std::string>& data
+                            pretty_print_index index,
+                            avl_map<pretty_print_index, std::string>& data
                             ) const;
 
 public:
@@ -585,8 +610,8 @@ bool avl_map<Key, Value>::operator!=(const avl_map& other) const {
 
 template <typename Key, typename Value>
 std::string avl_map<Key, Value>::pretty_print() const {
-    avl_map<std::string, std::string> data = avl_map<std::string, std::string>{};
-    build_pretty_print_data(root, "", data);
+    auto data = avl_map<pretty_print_index, std::string>{};
+    build_pretty_print_data(root, {}, data);
 
     for (auto x : data) {
         std::cout << "oskar: " << std::get<0>(x) << " " << std::get<1>(x) << std::endl;
@@ -598,16 +623,34 @@ std::string avl_map<Key, Value>::pretty_print() const {
 template <typename Key, typename Value>
 void
 avl_map<Key, Value>::build_pretty_print_data(std::shared_ptr<node<Key, Value>> curr,
-                                             std::string index,
-                                             avl_map<std::string, std::string>& data
+                                             pretty_print_index index,
+                                             avl_map<pretty_print_index, std::string>& data
                                              ) const {
     if (curr) {
         std::ostringstream string_stream;
         string_stream << curr->key; // todo: include value, and move to Node
         data.insert(index, string_stream.str());
 
-        build_pretty_print_data(curr->left, index + "L", data);
-        build_pretty_print_data(curr->right, index + "R", data);
+        build_pretty_print_data(curr->left, index.append(false), data);
+        build_pretty_print_data(curr->right, index.append(true), data);
+    }
+}
+
+template <typename Key, typename Value>
+avl_map<Key, Value>::pretty_print_index
+avl_map<Key, Value>::pretty_print_index::append(bool left_or_right) const {
+    auto appended = *this;
+    appended.index.push_back(left_or_right);
+    return appended;
+}
+
+template <typename Key, typename Value>
+std::strong_ordering
+avl_map<Key, Value>::pretty_print_index::operator<=>(const pretty_print_index& other) const {
+    if (index.size() == other.index.size()) {
+        return index <=> other.index;
+    } else {
+        return index.size() <=> other.index.size();
     }
 }
 
